@@ -1,4 +1,4 @@
-module primus
+module pangoo
 
 go 1.20
 
