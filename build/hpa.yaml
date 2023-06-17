@@ -1,0 +1,42 @@
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: katalyst
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: katalyst-deployment
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          #表示期望资源利用率达到200%时触发扩容
+          averageUtilization: 200
+    - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            #256Mi,表示期望内存大小达到256Mi时触发扩容。averageValue需要与maxReplicas和minReplicas参数配合使用,来控制扩容上限和缩容下限。
+            #与averageUtilization相比,averageValue可以直接指定资源的绝对值,从而实现基于资源绝对值的自动弹性伸缩。
+            #一般来说,我们会根据场景需要选择使用averageUtilization或者averageValue。
+            averageValue: 256Mi
+
+
+  behavior:
+    scaleDown:
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 6 #指定最大每秒可缩容的Pod数量,如6个Pod/秒
+          #percentage: 20 #最大可缩容百分比
+    scaleUp:
+      policies:
+        - type: Pods
+          value: 3
+          periodSeconds: 60

@@ -8,7 +8,7 @@ import (
 )
 
 func NewIngress() *Ingress {
-	return &Ingress{ClientSet: newK8sClientSet()}
+	return &Ingress{ClientSet: pClientSet}
 }
 
 type Ingress struct {

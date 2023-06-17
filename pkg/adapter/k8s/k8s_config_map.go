@@ -20,7 +20,7 @@ type ConfigMapPara struct {
 }
 
 func NewConfigMap() *ConfigMap {
-	return &ConfigMap{ClientSet: newK8sClientSet()}
+	return &ConfigMap{ClientSet: pClientSet}//newK8sClientSet()
 }
 
 type ConfigMap struct {

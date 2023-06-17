@@ -1,0 +1,785 @@
+basePath: /
+definitions:
+  analyse.BaseResp:
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      msg:
+        type: string
+    type: object
+  analyse.ProjectInfo:
+    properties:
+      appId:
+        description: |-
+          应用对应的gitlab projectId
+          example: 1021
+        type: integer
+      appName:
+        description: |-
+          应用
+          example: quec-ota
+        type: string
+      branch:
+        description: |-
+          分支
+          example: 建立分支不建议中文
+        type: string
+      department:
+        description: |-
+          业务线
+          required: true
+          example: paas、saas
+        type: string
+      id:
+        type: integer
+      product:
+        description: |-
+          产品
+          required: true
+          example: dmp2.0
+        type: string
+      ref:
+        description: |-
+          目标分支
+          example: master
+        type: string
+      refTag:
+        description: 目标tag
+        type: string
+      tag:
+        description: |-
+          tag
+          example: 0.0.1
+        type: string
+    type: object
+  image.AppInfo:
+    properties:
+      app:
+        type: string
+      baseRepo:
+        type: string
+      confPath:
+        type: string
+      dockerFile:
+        type: string
+      gitUrl:
+        type: string
+      tag:
+        type: string
+    type: object
+  image.BaseResp:
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      msg:
+        type: string
+    type: object
+  image.ImageInfo:
+    properties:
+      apps:
+        items:
+          $ref: '#/definitions/image.AppInfo'
+        type: array
+    type: object
+  k8s.BaseResp:
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      msg:
+        type: string
+    type: object
+  k8s.DeployReq:
+    properties:
+      appName:
+        type: string
+      cmd:
+        type: string
+      department:
+        type: string
+      env:
+        type: string
+      port:
+        type: integer
+      product:
+        type: string
+      tag:
+        type: string
+    type: object
+  ops.AppDeployReq:
+    properties:
+      appInfo:
+        items:
+          $ref: '#/definitions/ops.AppInfo'
+        type: array
+      configBranch:
+        type: string
+      department:
+        type: string
+      env:
+        type: string
+      product:
+        type: string
+    type: object
+  ops.AppInfo:
+    properties:
+      CPU:
+        type: number
+      appName:
+        type: string
+      branch:
+        type: string
+      buildNo:
+        type: integer
+      gitUrl:
+        type: string
+      language:
+        enum:
+        - java
+        - front
+        - erlang
+        type: string
+      maxReplicas:
+        type: integer
+      memory:
+        type: integer
+      minReplicas:
+        type: integer
+      portMap:
+        items:
+          additionalProperties:
+            type: string
+          type: object
+        type: array
+      replicas:
+        type: integer
+    required:
+    - language
+    type: object
+  ops.BaseReq:
+    properties:
+      department:
+        type: string
+      product:
+        type: string
+    type: object
+  ops.BaseResp:
+    properties:
+      code:
+        type: integer
+      data:
+        additionalProperties:
+          type: string
+        type: object
+      msg:
+        type: string
+    type: object
+  ops.JobReq:
+    properties:
+      appName:
+        type: string
+      buildNo:
+        type: integer
+      department:
+        type: string
+      env:
+        type: string
+      product:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: 发布引擎中间件 【Katalyst】 by Damon.Wang
+  title: 发布引擎 [Pangoo]
+  version: "0.1"
+paths:
+  /api/v1/cloneCode:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 项目地址信息
+        in: body
+        name: gitUrls
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/analyse.BaseResp'
+      security:
+      - TokenAuth: []
+      summary: 拉取项目代码
+      tags:
+      - gitlab操作
+  /api/v1/compareInfo:
+    post:
+      consumes:
+      - application/json
+      description: 测试
+      parameters:
+      - description: appName
+        in: query
+        name: appName
+        required: true
+        type: string
+      - description: product，应用app对应的product如：dmp2
+        in: query
+        name: product
+        required: true
+        type: string
+      - description: from，比较对象
+        in: query
+        name: from
+        required: true
+        type: string
+      - description: to，被比较对象，如：master 分支或其它tag
+        in: query
+        name: to
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/analyse.BaseResp'
+      security:
+      - TokenAuth: []
+      summary: 代码对比
+      tags:
+      - gitlab操作
+  /api/v1/createBranch:
+    post:
+      consumes:
+      - application/json
+      description: 测试
+      parameters:
+      - description: projectInfo，创建分支所需信息
+        in: body
+        name: projectInfo
+        required: true
+        schema:
+          $ref: '#/definitions/analyse.ProjectInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/analyse.BaseResp'
+      security:
+      - TokenAuth: []
+      summary: 创建分支
+      tags:
+      - gitlab操作
+  /api/v1/createDeployment/:namespace:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: deployReq，部署所需的信息
+        in: body
+        name: deployReq
+        required: true
+        schema:
+          $ref: '#/definitions/k8s.DeployReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+      summary: 创建应用
+      tags:
+      - k8s操作
+  /api/v1/createTag:
+    post:
+      consumes:
+      - application/json
+      description: 测试
+      parameters:
+      - description: projectInfo，tag所需信息
+        in: body
+        name: projectInfo
+        required: true
+        schema:
+          $ref: '#/definitions/analyse.ProjectInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/analyse.BaseResp'
+      security:
+      - TokenAuth: []
+      summary: 创建tag
+      tags:
+      - gitlab操作
+  /api/v1/createView:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: view，所属视图
+        in: body
+        name: view
+        required: true
+        schema:
+          $ref: '#/definitions/ops.BaseReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+      summary: 创建View
+      tags:
+      - jenkins操作
+  /api/v1/deleteJob:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: job
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/ops.JobReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+      summary: 删除Job
+      tags:
+      - jenkins操作
+  /api/v1/deletePod:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: deployReq，部署所需的信息
+        in: body
+        name: deployReq
+        required: true
+        schema:
+          $ref: '#/definitions/k8s.DeployReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+      summary: 重启应用pod
+      tags:
+      - k8s操作
+  /api/v1/deployApp:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: job，构建、部署所需要的信息
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/ops.AppDeployReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+      summary: 部署应用
+      tags:
+      - jenkins操作
+  /api/v1/getDeployment/:namespace/:name:
+    get:
+      responses: {}
+      tags:
+      - k8s操作
+  /api/v1/getDeploymentList/{namespace}:
+    get:
+      parameters:
+      - description: 命名空间
+        in: path
+        name: namespace
+        required: true
+        type: string
+      responses: {}
+      tags:
+      - k8s操作
+  /api/v1/getImageInfo:
+    get:
+      responses: {}
+      tags:
+      - images
+  /api/v1/getProject/{projectId}:
+    get:
+      consumes:
+      - application/json
+      description: 测试单个项目
+      parameters:
+      - description: projectId
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: projectName
+        in: query
+        name: projectName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/analyse.BaseResp'
+      security:
+      - TokenAuth: []
+      summary: 获取单个项目
+      tags:
+      - gitlab操作
+  /api/v1/getProjects:
+    get:
+      consumes:
+      - application/json
+      description: 测试
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/analyse.BaseResp'
+      security:
+      - TokenAuth: []
+      summary: 获取所有分支情况
+      tags:
+      - gitlab操作
+  /api/v1/imageBuild:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: imageInfo，构建镜像所需信息
+        in: body
+        name: imageInfo
+        required: true
+        schema:
+          $ref: '#/definitions/image.ImageInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/image.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/image.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/image.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/image.BaseResp'
+      summary: 构建镜像
+      tags:
+      - images
+  /api/v1/imagePull:
+    get:
+      responses: {}
+      tags:
+      - images
+  /api/v1/imagePush:
+    post:
+      responses: {}
+      tags:
+      - images
+  /api/v1/mergeReq/{projectName}/{branchName}/{targetBranch}:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 项目名
+        in: path
+        name: projectName
+        required: true
+        type: string
+      - description: 源分支
+        in: path
+        name: branchName
+        required: true
+        type: string
+      - description: 目标分支
+        in: path
+        name: targetBranch
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/analyse.BaseResp'
+      security:
+      - TokenAuth: []
+      summary: 分支合并请求
+      tags:
+      - gitlab操作
+  /api/v1/restartApp:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: job，构建、部署所需要的信息
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/ops.AppDeployReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+      summary: 重启应用
+      tags:
+      - jenkins操作
+  /api/v1/rollBack:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: deployReq，部署所需的信息
+        in: body
+        name: deployReq
+        required: true
+        schema:
+          $ref: '#/definitions/k8s.DeployReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+      summary: 回滚应用pod到上一版本
+      tags:
+      - k8s操作
+  /api/v1/rollbackApp:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: job，构建、部署所需要的信息
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/ops.AppDeployReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+      summary: 回滚应用，默认至上一版本
+      tags:
+      - jenkins操作
+  /api/v1/updateApp:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: job，构建、部署所需要的信息
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/ops.AppDeployReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ops.BaseResp'
+      summary: 更新应用，更改cpu内存limit、伸缩pod
+      tags:
+      - jenkins操作
+  /api/v1/updateDeployment:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: deployReq，部署所需的信息
+        in: body
+        name: deployReq
+        required: true
+        schema:
+          $ref: '#/definitions/k8s.DeployReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/k8s.BaseResp'
+      summary: 更新应用
+      tags:
+      - k8s操作
+schemes:
+- http
+swagger: "2.0"

@@ -27,7 +27,7 @@ type NodeList struct {
 }
 
 func NewNodeService() *NodeService {
-	return &NodeService{ClientSet: newK8sClientSet()}
+	return &NodeService{ClientSet: pClientSet}
 }
 
 func PodRequests(pod *v1.Pod) (reqs map[v1.ResourceName]resource.Quantity, err error) {

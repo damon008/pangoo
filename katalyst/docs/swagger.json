@@ -1,0 +1,1191 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "发布引擎中间件 【Katalyst】 by Damon.Wang",
+        "title": "发布引擎 [Pangoo]",
+        "contact": {},
+        "version": "0.1"
+    },
+    "basePath": "/",
+    "paths": {
+        "/api/v1/cloneCode": {
+            "post": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gitlab操作"
+                ],
+                "summary": "拉取项目代码",
+                "parameters": [
+                    {
+                        "description": "项目地址信息",
+                        "name": "gitUrls",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/analyse.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/compareInfo": {
+            "post": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "description": "测试",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gitlab操作"
+                ],
+                "summary": "代码对比",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "appName",
+                        "name": "appName",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "product，应用app对应的product如：dmp2",
+                        "name": "product",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "from，比较对象",
+                        "name": "from",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "to，被比较对象，如：master 分支或其它tag",
+                        "name": "to",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/analyse.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/createBranch": {
+            "post": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "description": "测试",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gitlab操作"
+                ],
+                "summary": "创建分支",
+                "parameters": [
+                    {
+                        "description": "projectInfo，创建分支所需信息",
+                        "name": "projectInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/analyse.ProjectInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/analyse.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/createDeployment/:namespace": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "k8s操作"
+                ],
+                "summary": "创建应用",
+                "parameters": [
+                    {
+                        "description": "deployReq，部署所需的信息",
+                        "name": "deployReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/k8s.DeployReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/createTag": {
+            "post": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "description": "测试",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gitlab操作"
+                ],
+                "summary": "创建tag",
+                "parameters": [
+                    {
+                        "description": "projectInfo，tag所需信息",
+                        "name": "projectInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/analyse.ProjectInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/analyse.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/createView": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jenkins操作"
+                ],
+                "summary": "创建View",
+                "parameters": [
+                    {
+                        "description": "view，所属视图",
+                        "name": "view",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/deleteJob": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jenkins操作"
+                ],
+                "summary": "删除Job",
+                "parameters": [
+                    {
+                        "description": "job",
+                        "name": "job",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ops.JobReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/deletePod": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "k8s操作"
+                ],
+                "summary": "重启应用pod",
+                "parameters": [
+                    {
+                        "description": "deployReq，部署所需的信息",
+                        "name": "deployReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/k8s.DeployReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/deployApp": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jenkins操作"
+                ],
+                "summary": "部署应用",
+                "parameters": [
+                    {
+                        "description": "job，构建、部署所需要的信息",
+                        "name": "job",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ops.AppDeployReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/getDeployment/:namespace/:name": {
+            "get": {
+                "tags": [
+                    "k8s操作"
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/getDeploymentList/{namespace}": {
+            "get": {
+                "tags": [
+                    "k8s操作"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/getImageInfo": {
+            "get": {
+                "tags": [
+                    "images"
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/getProject/{projectId}": {
+            "get": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "description": "测试单个项目",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gitlab操作"
+                ],
+                "summary": "获取单个项目",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "projectId",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "projectName",
+                        "name": "projectName",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/analyse.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/getProjects": {
+            "get": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "description": "测试",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gitlab操作"
+                ],
+                "summary": "获取所有分支情况",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/analyse.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/imageBuild": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "构建镜像",
+                "parameters": [
+                    {
+                        "description": "imageInfo，构建镜像所需信息",
+                        "name": "imageInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/image.ImageInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/image.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/image.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/image.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/image.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/imagePull": {
+            "get": {
+                "tags": [
+                    "images"
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/imagePush": {
+            "post": {
+                "tags": [
+                    "images"
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/mergeReq/{projectName}/{branchName}/{targetBranch}": {
+            "post": {
+                "security": [
+                    {
+                        "TokenAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gitlab操作"
+                ],
+                "summary": "分支合并请求",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "项目名",
+                        "name": "projectName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "源分支",
+                        "name": "branchName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "目标分支",
+                        "name": "targetBranch",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/analyse.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/restartApp": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jenkins操作"
+                ],
+                "summary": "重启应用",
+                "parameters": [
+                    {
+                        "description": "job，构建、部署所需要的信息",
+                        "name": "job",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ops.AppDeployReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rollBack": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "k8s操作"
+                ],
+                "summary": "回滚应用pod到上一版本",
+                "parameters": [
+                    {
+                        "description": "deployReq，部署所需的信息",
+                        "name": "deployReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/k8s.DeployReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rollbackApp": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jenkins操作"
+                ],
+                "summary": "回滚应用，默认至上一版本",
+                "parameters": [
+                    {
+                        "description": "job，构建、部署所需要的信息",
+                        "name": "job",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ops.AppDeployReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/updateApp": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jenkins操作"
+                ],
+                "summary": "更新应用，更改cpu内存limit、伸缩pod",
+                "parameters": [
+                    {
+                        "description": "job，构建、部署所需要的信息",
+                        "name": "job",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ops.AppDeployReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ops.BaseResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/updateDeployment": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "k8s操作"
+                ],
+                "summary": "更新应用",
+                "parameters": [
+                    {
+                        "description": "deployReq，部署所需的信息",
+                        "name": "deployReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/k8s.DeployReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/k8s.BaseResp"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "analyse.BaseResp": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "analyse.ProjectInfo": {
+            "type": "object",
+            "properties": {
+                "appId": {
+                    "description": "应用对应的gitlab projectId\nexample: 1021",
+                    "type": "integer"
+                },
+                "appName": {
+                    "description": "应用\nexample: quec-ota",
+                    "type": "string"
+                },
+                "branch": {
+                    "description": "分支\nexample: 建立分支不建议中文",
+                    "type": "string"
+                },
+                "department": {
+                    "description": "业务线\nrequired: true\nexample: paas、saas",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "product": {
+                    "description": "产品\nrequired: true\nexample: dmp2.0",
+                    "type": "string"
+                },
+                "ref": {
+                    "description": "目标分支\nexample: master",
+                    "type": "string"
+                },
+                "refTag": {
+                    "description": "目标tag",
+                    "type": "string"
+                },
+                "tag": {
+                    "description": "tag\nexample: 0.0.1",
+                    "type": "string"
+                }
+            }
+        },
+        "image.AppInfo": {
+            "type": "object",
+            "properties": {
+                "app": {
+                    "type": "string"
+                },
+                "baseRepo": {
+                    "type": "string"
+                },
+                "confPath": {
+                    "type": "string"
+                },
+                "dockerFile": {
+                    "type": "string"
+                },
+                "gitUrl": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "image.BaseResp": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "image.ImageInfo": {
+            "type": "object",
+            "properties": {
+                "apps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/image.AppInfo"
+                    }
+                }
+            }
+        },
+        "k8s.BaseResp": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "k8s.DeployReq": {
+            "type": "object",
+            "properties": {
+                "appName": {
+                    "type": "string"
+                },
+                "cmd": {
+                    "type": "string"
+                },
+                "department": {
+                    "type": "string"
+                },
+                "env": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "product": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "ops.AppDeployReq": {
+            "type": "object",
+            "properties": {
+                "appInfo": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ops.AppInfo"
+                    }
+                },
+                "configBranch": {
+                    "type": "string"
+                },
+                "department": {
+                    "type": "string"
+                },
+                "env": {
+                    "type": "string"
+                },
+                "product": {
+                    "type": "string"
+                }
+            }
+        },
+        "ops.AppInfo": {
+            "type": "object",
+            "required": [
+                "language"
+            ],
+            "properties": {
+                "CPU": {
+                    "type": "number"
+                },
+                "appName": {
+                    "type": "string"
+                },
+                "branch": {
+                    "type": "string"
+                },
+                "buildNo": {
+                    "type": "integer"
+                },
+                "gitUrl": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string",
+                    "enum": [
+                        "java",
+                        "front",
+                        "erlang"
+                    ]
+                },
+                "maxReplicas": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "type": "integer"
+                },
+                "minReplicas": {
+                    "type": "integer"
+                },
+                "portMap": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "replicas": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ops.BaseReq": {
+            "type": "object",
+            "properties": {
+                "department": {
+                    "type": "string"
+                },
+                "product": {
+                    "type": "string"
+                }
+            }
+        },
+        "ops.BaseResp": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "ops.JobReq": {
+            "type": "object",
+            "properties": {
+                "appName": {
+                    "type": "string"
+                },
+                "buildNo": {
+                    "type": "integer"
+                },
+                "department": {
+                    "type": "string"
+                },
+                "env": {
+                    "type": "string"
+                },
+                "product": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

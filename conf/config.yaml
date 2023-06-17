@@ -1,0 +1,24 @@
+swag:
+  host: 10.66.38.142
+git:
+  project_url: "http://192.168.23.184:8108/api/v4"
+  #project_url: "http://gitlab.quectel.com:8108/api/v4"
+  token: "v6ccCDB9CV1FxFExmR_o"
+  branch_url: "000"
+
+jenkins:
+  #baseUrl: "http://jenkins-cloud.quectel.com"
+  baseUrl: "http://192.168.25.182:80"
+  username: "chambers.qi"
+  password: "11bd53fb124955f1be4d02b9279c62cc38"
+
+docker:
+  path: ""
+  repo: ""
+  username: ""
+  password: ""
+  dockerfilePath: ""
+
+
+k8s:
+  kubeConfig: "conf/kubeconfig1"

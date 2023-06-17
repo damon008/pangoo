@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: katalyst-svc
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+    - name: mw01
+      #hostIP访问的node端口
+      nodePort: 30230
+      #k8s集群内部访问service的端口
+      port: 20000
+      #pod的端口，一般和containerPort一样，即pod内部的容器端口2999
+      #从port和nodePort来的流量经过kube-proxy流入到后端pod的targetPort上，最后进入容器。
+      targetPort: mw01
+  selector:
+    app: katalyst

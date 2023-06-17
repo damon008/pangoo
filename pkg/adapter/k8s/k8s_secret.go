@@ -19,7 +19,7 @@ type SecretPara struct {
 }
 
 func NewSecret() *Secret {
-	return &Secret{ClientSet: newK8sClientSet()}
+	return &Secret{ClientSet: pClientSet}
 }
 
 type Secret struct {

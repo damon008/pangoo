@@ -8,7 +8,7 @@ import (
 )
 
 func NewPodService() *PodService {
-	return &PodService{ClientSet: newK8sClientSet()}
+	return &PodService{ClientSet: pClientSet}
 }
 
 type Container = v1.Container

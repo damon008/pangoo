@@ -1,8 +1,8 @@
 package util
 
 import (
-	"github.com/cloudwego/kitex/pkg/klog"
-	"primus/pkg/constants"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"pangoo/pkg/constants"
 	"net"
 	"strings"
 )
@@ -10,7 +10,7 @@ import (
 func GetIpAddr() string {
 	conn, err := net.Dial("udp", "8.8.8.8:53")
 	if err != nil {
-		klog.Error(err)
+		hlog.Error(err)
 		return ""
 	}
 	localAddr := conn.LocalAddr().(*net.UDPAddr)

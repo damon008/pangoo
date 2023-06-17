@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deploy.cloud.quectel.com/minReplicas: '1'
+    deploy.cloud.quectel.com/maxReplicas: '5'
+  name: katalyst-deployment
+  namespace: default
+  labels:
+    app: katalyst
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: katalyst
+  template:
+    metadata:
+      labels:
+        app: katalyst
+    spec:
+      nodeSelector:
+        katalyst: "true"
+      containers:
+        - name: katalyst
+          image: katalyst
+          workingDir: /data
+          imagePullPolicy: IfNotPresent
+          args: ["sh", "-c", "./app-katalyst", "&"]
+          ports:
+            - name: mw01
+              containerPort: 20000
+          #          env:
+          #            - name: TEST_KEY
+          #              valueFrom:
+          #                configMapKeyRef:
+          #                  name: katalyst-cm
+          #                  key: TEST_KEY
+          volumeMounts:
+            - name: katalyst-cm
+              #mountPath: /data/cfg/dev or test or pro
+              mountPath: /data/conf
+              readOnly: true
+            - mountPath: /home/katalyst
+              name: katalyst-path
+            - mountPath: /data/katalyst
+              name: katalyst-log-path
+            - mountPath: /etc/kubernetes
+              name: kube-config-path
+            - mountPath: /abnormal_data_dir
+              name: abnormal-data-dir
+
+      resources:
+        requests:
+          cpu: 200m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+      hostAliases:
+      - ip: "192.168.8.107"
+        hostnames:
+        - "foo.remote"
+      volumes:
+        - name: katalyst-cm
+          configMap:
+            name: katalyst-cm
+            defaultMode: 420
+            #如果configmap中所有文件都需要，则无需指定
+            #items:
+              #- key: config.yaml
+                #path: config.yaml
+                #mode: 0644
+        - name: katalyst-path
+          hostPath:
+            path: /var/pai/katalyst
+        - name: katalyst-log-path
+          hostPath:
+            path: /data/katalyst
+        - name: kube-config-path
+          hostPath:
+            path: /etc/kubernetes
+        - name: abnormal-data-dir
+          hostPath:
+            path: /data/images/detect_result/defect
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: katalyst-cm
+#immutable: true
+data:
+  config.yaml: |
+    swag:
+      host: 10.66.38.142
+    git:
+      project_url: "http://192.168.25.116:8108/api/v4"
+      token: "txCUZ6GZQo5YTEGbrHhW"
+      branch_url: ""
+
+    jenkins:
+      baseUrl: "http://jenkins-cloud.quectel.com"
+      username: "chambers.qi"
+      password: "11bd53fb124955f1be4d02b9279c62cc38"
+
+    docker:
+      path: ""
+      repo: ""
+      username: ""
+      password: ""
+      dockerfilePath: ""

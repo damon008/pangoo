@@ -10,7 +10,7 @@ import (
 type K8sServicePara = v1.Service
 
 func NewService() *Service {
-	return &Service{ClientSet: newK8sClientSet()}
+	return &Service{ClientSet: pClientSet}
 }
 
 type Service struct {

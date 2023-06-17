@@ -10,7 +10,7 @@ import (
 )
 
 func NewLabel() *Label {
-	return &Label{ClientSet: newK8sClientSet()}
+	return &Label{ClientSet: pClientSet}
 }
 
 type Label struct {

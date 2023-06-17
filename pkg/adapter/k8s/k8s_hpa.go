@@ -8,7 +8,7 @@ import (
 )
 
 func NewHPA() *HPA {
-	return &HPA{ClientSet: newK8sClientSet()}
+	return &HPA{ClientSet: pClientSet} //newK8sClientSet()
 }
 
 type HPA struct {

@@ -5,10 +5,22 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"sync"
+	"sync/atomic"
+)
+
+var (
+	//这些操作都是原子性的，因此可以安全地在多个goroutine中使用。
+	//使用sync.Once和atomic.Value结合实现单例模式，可以保证高并发情况下的高可用性。
+	instance atomic.Value
+	once     sync.Once
 )
 
 func NewDeployment() *Deployment {
-	return &Deployment{ClientSet: newK8sClientSet()}
+	once.Do(func() {
+		instance.Store(&Deployment{ClientSet: pClientSet})
+	})
+	return instance.Load().(*Deployment)//&Deployment{ClientSet: pClientSet}//newK8sClientSet()
 }
 
 type Deployment struct {
@@ -16,6 +28,7 @@ type Deployment struct {
 }
 
 func (dep *Deployment) Create(namespace string, deployment *v1.Deployment) (*v1.Deployment, error) {
+	//pClientSet.AppsV1().Deployments(namespace).Create(context.TODO(), deployment, metav1.CreateOptions{})
 	return dep.ClientSet.AppsV1().Deployments(namespace).Create(context.TODO(), deployment, metav1.CreateOptions{})
 }
 

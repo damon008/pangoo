@@ -96,11 +96,11 @@ func InitHttpCliWithNacos(conf naming_client.INamingClient) {
 func InitHttpCli() {
 	c, err := client.NewClient(
 		//client.WithDialTimeout(1 * time.Second),//连接建立超时时间，默认 1s
-		client.WithWriteTimeout(500*time.Millisecond),       //写入数据超时时间，默认值：无限
-		client.WithClientReadTimeout(2*time.Second),         //设置读取 response 的最长时间，默认无限长
-		client.WithMaxConnWaitTimeout(100*time.Millisecond), //设置等待空闲连接的最大时间，默认不等待
-		client.WithMaxIdleConnDuration(3*time.Second),       //空闲连接超时时间,当超时后会关闭该连接，默认10s
-		client.WithMaxConnDuration(3*time.Second),           //设置连接存活的最大时长，超过这个时间的连接在完成当前请求后会被关闭，默认无限长
+		client.WithWriteTimeout(5000*time.Millisecond),       //写入数据超时时间，默认值：无限
+		client.WithClientReadTimeout(20*time.Second),         //设置读取 response 的最长时间，默认无限长
+		client.WithMaxConnWaitTimeout(1000*time.Millisecond), //设置等待空闲连接的最大时间，默认不等待
+		client.WithMaxIdleConnDuration(30*time.Second),       //空闲连接超时时间,当超时后会关闭该连接，默认10s
+		client.WithMaxConnDuration(30*time.Second),           //设置连接存活的最大时长，超过这个时间的连接在完成当前请求后会被关闭，默认无限长
 		client.WithMaxConnsPerHost(1000000),
 		//client.WithRetryConfig (
 		//	retry.WithMaxAttemptTimes(3), // 最大的尝试次数，包括初始调用
@@ -218,11 +218,13 @@ func HttpDo(uri string, method string) (*protocol.Response, error) {
 	res := &protocol.Response{}
 	req.Header.SetMethod(method)
 	req.SetRequestURI(uri)
+	//req.Header.Set("PRIVATE-TOKEN", conf.EnvConfig.Token)
 	//req.Header.SetHostBytes(req.URI().Host())
-	req.Options().Apply([]config.RequestOption{config.WithSD(true)})
+	//req.Options().Apply([]config.RequestOption{config.WithSD(true)})
 	if err := httpCli.Do(context.Background(), req, res); err != nil {
 		return res, err
 	}
+	//hlog.Info(res.StatusCode())
 	return res, nil
 }
 

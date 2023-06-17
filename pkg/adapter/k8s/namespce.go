@@ -9,7 +9,7 @@ import (
 )
 
 func NewNamespce() *Namespce {
-	return &Namespce{ClientSet: newK8sClientSet()}
+	return &Namespce{ClientSet: pClientSet}
 }
 
 type Namespce struct {
