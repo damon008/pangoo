@@ -159,7 +159,7 @@ func Info(args ...interface{}) {
 	return fmt.Sprintf("%s:%d", file, line)
 }*/
 
-func NewLogger(logFile string) *lumberjack.Logger {
+func NewLogger(logFile string) *io.Writer {
 	if err := os.MkdirAll(logFile, 0o777); err != nil {
 		fmt.Println(err.Error())
 	}
@@ -178,7 +178,9 @@ func NewLogger(logFile string) *lumberjack.Logger {
 		MaxAge:     365 * 2, // A file can exist for a maximum of 10 days.
 		Compress:   true,    // Compress with gzip.
 	}
-	return lumberjackLogger
+	// 创建一个多写入器，用于同时输出到文件和控制台
+	multiWriter := io.MultiWriter(os.Stdout, lumberjackLogger)
+	return &multiWriter
 }
 
 func (l *Logger) Trace(v ...interface{}) {

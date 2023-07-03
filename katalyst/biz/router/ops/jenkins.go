@@ -21,11 +21,11 @@ func Register(r *server.Hertz) {
 		_api := root.Group("/api", _apiMw()...)
 		{
 			_v1 := _api.Group("/v1", _v1Mw()...)
-			//_v1.POST("/buildLog", append(_buildlogMw(), ops.BuildLog)...)
 			_v1.POST("/createView", append(_createviewMw(), ops.CreateView)...)
-			_v1.DELETE("/deleteJob", append(_deletejobMw(), ops.DeleteJob)...)
-			//_v1.DELETE("/deleteView", append(_deleteviewMw(), ops.DeleteView)...)
 			_v1.POST("/deployApp", append(_deployappMw(), ops.DeployApp)...)
+			_v1.POST("/restartApp", append(_restartappMw(), ops.RestartApp)...)
+			_v1.POST("/rollbackApp", append(_rollbackappMw(), ops.RollbackApp)...)
+			_v1.POST("/updateApp", append(_updateappMw(), ops.UpdateApp)...)
 		}
 	}
 }

@@ -18,13 +18,15 @@ package infra
 
 import (
 	"fmt"
+	"strings"
+	"sync"
+
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+
 	"pangoo/katalyst/biz/model/analyse"
 	"pangoo/pkg/conf"
 	"pangoo/pkg/util/singleton"
-	"strings"
-	"sync"
 )
 
 /*
@@ -34,26 +36,29 @@ import (
 
 func GetProjectInfo(appName, product string) *analyse.Project {
 	var wg sync.WaitGroup
-	//resultChan := make(chan *analyse.Project)
-	//doneChan := make(chan struct{})
+	// resultChan := make(chan *analyse.Project)
+	// doneChan := make(chan struct{})
 	var result *analyse.Project
 	var p []*analyse.Project
-	//http://192.168.25.116:8108/api/v4/search?scope=projects&search=quec-ota&private_token=txCUZ6GZQo5YTEGbrHhW
+	// http://192.168.25.116:8108/api/v4/search?scope=projects&search=quec-ota&private_token=txCUZ6GZQo5YTEGbrHhW
 	url := fmt.Sprintf("%s/search?scope=projects&search=%s&private_token=%s", conf.EnvConfig.Config.GitConfig.ProjectUrl, appName, conf.EnvConfig.Config.GitConfig.Token)
 	sp, err := singleton.HttpDo(url, "GET")
 	hlog.Debugf("search projects resp body: %s", string(sp.Body()))
+	if (string(sp.Body())=="[]") {
+		return nil
+	}
 	if err = sonic.Unmarshal(sp.Body(), &p); err != nil {
 		hlog.Error(err)
-		return &analyse.Project{}
+		return nil
 	}
 
 	for _, d := range p {
 		wg.Add(1)
 		go func(pj *analyse.Project) {
 			defer wg.Done()
-			ur:= pj.WebURL
-			name :=pj.Name
-			if (strings.Contains(ur, strings.ToLower(product)) || strings.Contains(ur, strings.ToUpper(product))) {
+			ur := pj.WebURL
+			name := pj.Name
+			if strings.Contains(ur, strings.ToLower(product)) || strings.Contains(ur, strings.ToUpper(product)) {
 				if name == appName {
 					hlog.Debug(name)
 					/*resultChan <- &analyse.Project{
@@ -68,7 +73,7 @@ func GetProjectInfo(appName, product string) *analyse.Project {
 						Name:          name,
 						HTTPURLToRepo: pj.HTTPURLToRepo,
 						SSHURLToRepo:  pj.SSHURLToRepo,
-						WebURL: pj.WebURL,
+						WebURL:        pj.WebURL,
 					}
 					return
 				}
@@ -93,6 +98,6 @@ func GetProjectInfo(appName, product string) *analyse.Project {
 	}()*/
 
 	wg.Wait()
-	//close(resultChan)
+	// close(resultChan)
 	return result
 }

@@ -45,3 +45,18 @@ func _deployappMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _restartappMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _rollbackappMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateappMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

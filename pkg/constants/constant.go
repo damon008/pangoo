@@ -23,6 +23,7 @@ const (
 	UserServiceName         = "demouser"
 	AnalyseServiceName         = "analyse-service"
 	ProducerServiceName         = "producer-service"
+	EnhanceServiceName         = "enhance-controller"
 	HelloServiceName         = "hello-server"
 	ElenaServiceName         = "demoElena"
 	FileServiceName         = "demofile"

@@ -45,6 +45,13 @@ func CreateBranch(info *analyse.ProjectInfo) (*response.BaseResp,error) {
 	var err error
 	var res *protocol.Response
 	project := infra.GetProjectInfo(info.AppName, info.Product)
+	if project ==nil {
+		return &response.BaseResp{
+			Code: -3,
+			Msg:  "not exist",
+			Data: nil,
+		}, err
+	}
 	url := fmt.Sprintf("%s/projects/%d/repository/branches?branch=%s&ref=%s&private_token=%s", conf.EnvConfig.Config.GitConfig.ProjectUrl, project.ID, info.Branch, info.Ref, conf.EnvConfig.Config.GitConfig.Token)
 	if res, err = singleton.HttpDo(url, "POST"); err == nil {
 		if res.StatusCode() == http.StatusOK ||
@@ -73,6 +80,13 @@ func CreateTag(info *analyse.ProjectInfo) (*response.BaseResp,error) {
 	var err error
 	var res *protocol.Response
 	project := infra.GetProjectInfo(info.AppName, info.Product)
+	if project ==nil {
+		return &response.BaseResp{
+			Code: -3,
+			Msg:  "not exist",
+			Data: nil,
+		}, err
+	}
 	url := fmt.Sprintf("%s/projects/%d/repository/tags?ref=%s&tag_name=%s&private_token=%s", conf.EnvConfig.Config.GitConfig.ProjectUrl, project.ID, info.Branch, info.Tag, conf.EnvConfig.Config.GitConfig.Token)
 	if res, err = singleton.HttpDo(url, "POST"); err == nil {
 		if res.StatusCode() == http.StatusOK ||
@@ -99,6 +113,13 @@ func CreateTag(info *analyse.ProjectInfo) (*response.BaseResp,error) {
 
 func CompareInfo(appName, product, from, to string) (*response.BaseResp, error) {
 	project := infra.GetProjectInfo(appName, product)
+	if project ==nil {
+		return &response.BaseResp{
+			Code: -3,
+			Msg:  "not exist",
+			Data: nil,
+		}, nil
+	}
 	hlog.Debug("project: ", project)
 	if (project != nil) {
 		url := fmt.Sprintf("%s/projects/%d/repository/commits/%s?private_token=%s", conf.EnvConfig.Config.GitConfig.ProjectUrl, project.ID, to, conf.EnvConfig.Config.GitConfig.Token)
@@ -144,6 +165,13 @@ func CompareInfo(appName, product, from, to string) (*response.BaseResp, error) 
 
 func MergeReq(info *analyse.ProjectInfo) (*response.BaseResp, error) {
 	project := infra.GetProjectInfo(info.AppName, info.Product)
+	if project ==nil {
+		return &response.BaseResp{
+			Code: -3,
+			Msg:  "not exist",
+			Data: nil,
+		}, nil
+	}
 	url := fmt.Sprintf("%s/projects/%d/merge_requests?private_token=%s", conf.EnvConfig.Config.GitConfig.ProjectUrl, project.ID, conf.EnvConfig.Config.GitConfig.Token)
 	//hlog.Info(url)
 	data := struct {

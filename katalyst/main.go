@@ -3,38 +3,40 @@
 package main
 
 import (
-	"context"
+	//"context"
+	// "k8s.io/apimachinery/pkg/util/wait"
+	"os"
+	"os/signal"
+	"runtime"
+	"syscall"
+	"time"
+
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/render"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/hertz-contrib/gzip"
-	"github.com/hertz-contrib/obs-opentelemetry/provider"
-	hertztracing "github.com/hertz-contrib/obs-opentelemetry/tracing"
+	//"github.com/hertz-contrib/obs-opentelemetry/provider"
+	//hertztracing "github.com/hertz-contrib/obs-opentelemetry/tracing"
 	"github.com/hertz-contrib/swagger"
 	swaggerFiles "github.com/swaggo/files"
+
 	"pangoo/pkg/util"
-	"runtime"
-	"syscall"
-	"time"
 
-	//"pangoo/pkg/util"
+	// "pangoo/pkg/util"
 
-	//"k8s.io/apimachinery/pkg/util/wait"
-	"os"
-	"os/signal"
 	"pangoo/katalyst/biz/router"
 	_ "pangoo/katalyst/docs"
 	"pangoo/pkg/adapter/docker"
 	"pangoo/pkg/adapter/jenkins"
 	"pangoo/pkg/adapter/k8s"
 	"pangoo/pkg/conf"
-	//"pangoo/pkg/util"
+	// "pangoo/pkg/util"
 	"pangoo/pkg/util/singleton"
 )
 
-//var fileName = "/data/conf/config.yaml"
+// var fileName = "/data/conf/config.yaml"
 var fileName = "conf/config.yaml"
 var logFile = "/data/katalyst/logs/"
 
@@ -54,53 +56,52 @@ func main() {
 	if os.Getenv("CONFIG_ENV") == "prod" {
 		fileName = "conf/config-prod.yaml"
 	}
-	p := provider.NewOpenTelemetryProvider(
+	/*p := provider.NewOpenTelemetryProvider(
 		provider.WithServiceName("katalyst"),
-		provider.WithExportEndpoint("121.37.173.206:4317"), //("localhost:4317"),
+		provider.WithExportEndpoint("121.37.173.206:4317"), // ("localhost:4317"),
 		provider.WithInsecure(),
 	)
 	defer func(ctx context.Context, p provider.OtelProvider) {
 		_ = p.Shutdown(ctx)
-	}(context.Background(), p)
-	//hlog.SetLogger(logrus.NewLogger())
-	//与上面不可兼得，只能按照一种格式输出
-	hlog.SetOutput(util.NewLogger(logFile))
+	}(context.Background(), p)*/
+	// hlog.SetLogger(logrus.NewLogger())
+	// 与上面不可兼得，只能按照一种格式输出
+	hlog.SetOutput(*util.NewLogger(logFile))
 	hlog.SetLevel(hlog.LevelDebug)
 	conf.LoadAdmissionConf(fileName)
-	tracer, cfg := hertztracing.NewServerTracer()
+	//tracer, cfg := hertztracing.NewServerTracer()
 	h := server.Default(
-		tracer,
+		//tracer,
 		server.WithHostPorts(":20000"),
-		//server.WithStreamBody(true),//	如果开启，则会使用流式处理 body
-		server.WithReadTimeout(500 * time.Millisecond),
-		//server.WithWriteTimeout(500 *time.Millisecond),
-		server.WithMaxRequestBodySize(10 * 1024 * 1024), //10M
-		server.WithIdleTimeout(30 * time.Second),//长连接请求链接空闲超时时间。默认值：3min
-		//server.WithTransport(standard.NewTransporter),
+		// server.WithStreamBody(true),//	如果开启，则会使用流式处理 body
+		server.WithReadTimeout(500*time.Millisecond),
+		// server.WithWriteTimeout(500 *time.Millisecond),
+		server.WithMaxRequestBodySize(10*1024*1024), // 10M
+		server.WithIdleTimeout(30*time.Second),      // 长连接请求链接空闲超时时间。默认值：3min
+		// server.WithTransport(standard.NewTransporter),
 	)
-	h.Use(hertztracing.ServerMiddleware(cfg))
-	//h.StaticFS("/", &app.FS{Root: "./", GenerateIndexPages: true})
-	h.Use(gzip.Gzip(gzip.BestCompression)) //DefaultCompression
-	//如果是使用标准网络库，无此限制
-	//如果是使用 netpoll，默认最大连接数为 10000
-	//Server端连接数set
+	//h.Use(hertztracing.ServerMiddleware(cfg))
+	// h.StaticFS("/", &app.FS{Root: "./", GenerateIndexPages: true})
+	h.Use(gzip.Gzip(gzip.BestCompression)) // DefaultCompression
+	// 如果是使用标准网络库，无此限制
+	// 如果是使用 netpoll，默认最大连接数为 10000
+	// Server端连接数set
 	gopool.SetCap(1000000)
 	go k8s.CreateClientsByCluster("", conf.EnvConfig.Config.K8sConfig.KubeConfig)
 	go docker.NewClient()
 	go singleton.InitHttpCli()
-	//hlog.Debugf(conf.EnvConfig.JenkinsConfig.BaseUrl)
+	// hlog.Debugf(conf.EnvConfig.JenkinsConfig.BaseUrl)
 	go jenkins.NewJenkinsCli(conf.EnvConfig.Config.JenkinsConfig.BaseUrl, conf.EnvConfig.Config.JenkinsConfig.Username, conf.EnvConfig.Config.JenkinsConfig.Password)
 
 	router.GeneratedRegister(h)
-	url := swagger.URL("http://"+ conf.EnvConfig.Config.SwagConfig.Host + ":20000/swagger/doc.json") // The url pointing to API definition
+	url := swagger.URL("http://" + conf.EnvConfig.Config.SwagConfig.Host + ":20000/swagger/doc.json") // The url pointing to API definition
 	h.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler, url))
 
-	//stop := make(chan struct{})
+	// stop := make(chan struct{})
 	// 开始监听文件变化事件
-	//go wait.Until(watchFile, 1*time.Second, stop)
+	// go wait.Until(watchFile, 1*time.Second, stop)
 	stopChannel := make(chan os.Signal, 1)
 	signal.Notify(stopChannel, syscall.SIGTERM, syscall.SIGINT)
-
 
 	go conf.WatchAdmissionConf(fileName, stopChannel)
 

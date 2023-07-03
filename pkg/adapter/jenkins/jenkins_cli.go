@@ -90,3 +90,7 @@ func GetJob(ctx context.Context, name string) (*gojenkins.Job, error) {
 func UpdateJob(ctx context.Context, job string, config string) *gojenkins.Job {
 	return j.UpdateJob(ctx, job, config)
 }
+
+func GetBuild(ctx context.Context, jobName string, bumber int64) (*gojenkins.Build, error) {
+	return j.GetBuild(ctx, jobName, bumber)
+}

@@ -3,7 +3,7 @@ package handler
 
 import (
 	"fmt"
-	"primus/pkg/constants"
+	"pangoo/pkg/constants"
 )
 
 
